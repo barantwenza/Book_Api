@@ -11,3 +11,11 @@ class BookSerialiser(serializers.Serializer):
     # create method. will be called in order to create a book in the data base
     def create(self, data):
         return Book.objects.create(**data)
+    
+    def update(self, instance, data):
+        instance.title = data.get('title', instance.title)
+        instance.number_of_pages = data.get('number_of_pages', instance.number_of_pages)
+        instance.published_date = data.get('published_date', instance.published_date)
+        instance.quantity = data.get('quantity', instance.quantity)
+        instance.save()
+        return instance
