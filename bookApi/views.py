@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import status
 from django.http import JsonResponse
 from .serializers import BookSerialiser
 from .models import Book
@@ -26,7 +27,12 @@ def book_create(request):
     
 @api_view(['GET', 'PUT', 'DELETE'])
 def book(request, pk):
-    book = Book.objects.get(pk=pk)
+    try:
+        book = Book.objects.get(pk=pk)
+    except: return Response({
+        'error':'Book does not exist'
+        }, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == 'GET':
         serializer = BookSerialiser(book)
         return Response(serializer.data)
@@ -36,7 +42,7 @@ def book(request, pk):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return serializer.errors
+        return Response (serializer.errors)
     
     if request.method =='DELETE':
         book.delete()
